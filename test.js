@@ -17,10 +17,10 @@ class Tester {
     try {
       if (func(value)) {
         stats.passed++;
-        console.log(`Test passed: ${message}!`);
+        console.log(`Test passed: ${message}.`);
       } else {
         stats.failed++;
-        console.error(`Failed test: ${message}!!!`);
+        console.error(`Failed test: ${message}!`);
       }
     } catch (error) {
       console.error(`Failed test: ${message}!!!`, error);
@@ -38,7 +38,7 @@ new Tester('Decimal value check', (value) => {
   if (_test.get() !== '0101000101111110') { return false; }
   if (_test.getLength() !== 16) { return false; }
   if (_test.getHex() !== '517E') { return false; }
-  if (_test.getDcimal() !== value) { return false; }
+  if (_test.getDecimal() !== value) { return false; }
 
   return true;
 }, 20862);
@@ -50,7 +50,7 @@ new Tester('Binary string check', (value) => {
   if (_test.get() !== '0001000101111110') { return false; }
   if (_test.getLength() !== 16) { return false; }
   if (_test.getHex() !== '117E') { return false; }
-  if (_test.getDcimal() !== 4478) { return false; }
+  if (_test.getDecimal() !== 4478) { return false; }
 
   return true;
 }, '1000101111110');
@@ -62,7 +62,7 @@ new Tester('Binary array check', (value) => {
   if (_test.get() !== '0001000010100000') { return false; }
   if (_test.getLength() !== 16) { return false; }
   if (_test.getHex() !== '10A0') { return false; }
-  if (_test.getDcimal() !== 4256) { return false; }
+  if (_test.getDecimal() !== 4256) { return false; }
 
   return true;
 }, [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]);
