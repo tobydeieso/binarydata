@@ -231,15 +231,8 @@ class BinaryData {
    * TBA
    * @returns {number}
    */
-  getDecimal(external) {
-    external = external || this.#_value;
-    let decimal = 0;
-
-    external.slice().reverse().forEach((value, bit) => {
-      if (value) { decimal += Math.pow(2, bit); }
-    });
-
-    return decimal;
+  getDecimal() {
+    return this.#getDecimalInternal(this.#_value);
   }
 
   // Internal binary conversions
@@ -310,9 +303,18 @@ class BinaryData {
 
     return bitValues;
   }
+  
+  // Internal decimal conversions
+  #getDecimalInternal(binaryList) {
+    let decimal = 0;
 
-  // Bitwise Operations
-  // TODO: Fill out the following...
+    binaryList.slice().reverse().forEach((value, bit) => {
+      if (value) { decimal += Math.pow(2, bit); }
+    });
+
+    return decimal;
+  }
+
   #convertToDecimal(data) {
     if (typeof data === 'number') {
 
@@ -322,17 +324,21 @@ class BinaryData {
     } else if (typeof data === 'string') {
 
       // Convert a string of 1's and 0's
-      return this.getDecimal(this.#binaryStringToBinary(data));
+      return this.#getDecimalInternal(this.#binaryStringToBinary(data));
 
     } else if (typeof data === 'object' && Array.isArray(data)) {
 
       // Convert an array of 0's and 1's
-      return this.getDecimal(this.#binaryArrayToBinary(data));
+      return this.#getDecimalInternal(this.#binaryArrayToBinary(data));
 
     }
 
     return 0;
   }
+
+  // Bitwise Operations
+  // TODO: Needs limits to fix operations to the bit depth in use (currently swaps to the
+  // system depth due to using the core ECMA Script Bitwise operators
 
   and(data) {
     this.set(this.#convertToDecimal(data) & this.getDecimal());
