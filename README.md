@@ -1,3 +1,3 @@
-# Astro Binary
+# Astro's BinaryData
 
-TBA
+A pseudo binary object type.
