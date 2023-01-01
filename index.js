@@ -35,87 +35,35 @@ class BinaryData {
    * @type {word[]}
    */
   #wordTable = [
-    {
-      binary: '0000',
-      hex: '0',
-      decimal: 0
-    },
-    {
-      binary: '0001',
-      hex: '1',
-      decimal: 1
-    },
-    {
-      binary: '0010',
-      hex: '2',
-      decimal: 2
-    },
-    {
-      binary: '0011',
-      hex: '3',
-      decimal: 3
-    },
-    {
-      binary: '0100',
-      hex: '4',
-      decimal: 4
-    },
-    {
-      binary: '0101',
-      hex: '5',
-      decimal: 5
-    },
-    {
-      binary: '0110',
-      hex: '6',
-      decimal: 6
-    },
-    {
-      binary: '0111',
-      hex: '7',
-      decimal: 7
-    },
-    {
-      binary: '1000',
-      hex: '8',
-      decimal: 8
-    },
-    {
-      binary: '1001',
-      hex: '9',
-      decimal: 9
-    },
-    {
-      binary: '1010',
-      hex: 'A',
-      decimal: 10
-    },
-    {
-      binary: '1011',
-      hex: 'B',
-      decimal: 11
-    },
-    {
-      binary: '1100',
-      hex: 'C',
-      decimal: 12
-    },
-    {
-      binary: '1101',
-      hex: 'D',
-      decimal: 13
-    },
-    {
-      binary: '1110',
-      hex: 'E',
-      decimal: 14
-    },
-    {
-      binary: '1111',
-      hex: 'F',
-      decimal: 15
-    }
+    { binary: '0000', hex: '0', decimal: 0 },
+    { binary: '0001', hex: '1', decimal: 1 },
+    { binary: '0010', hex: '2', decimal: 2 },
+    { binary: '0011', hex: '3', decimal: 3 },
+    { binary: '0100', hex: '4', decimal: 4 },
+    { binary: '0101', hex: '5', decimal: 5 },
+    { binary: '0110', hex: '6', decimal: 6 },
+    { binary: '0111', hex: '7', decimal: 7 },
+    { binary: '1000', hex: '8', decimal: 8 },
+    { binary: '1001', hex: '9', decimal: 9 },
+    { binary: '1010', hex: 'A', decimal: 10 },
+    { binary: '1011', hex: 'B', decimal: 11 },
+    { binary: '1100', hex: 'C', decimal: 12 },
+    { binary: '1101', hex: 'D', decimal: 13 },
+    { binary: '1110', hex: 'E', decimal: 14 },
+    { binary: '1111', hex: 'F', decimal: 15 }
   ];
+
+  /**
+   * TBA
+   * @type {number[]}
+   */
+  #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ]
+
+  /**
+   * TBA
+   * @type {number[]}
+   */
+  #resolution = 4;
 
   /**
    * TBA
@@ -124,6 +72,10 @@ class BinaryData {
   constructor(data) {
     this.set(data);
   }
+
+  //////////////////
+  // External API //
+  //////////////////
 
   /**
    * TBA
@@ -234,23 +186,54 @@ class BinaryData {
   getDecimal() {
     return this.#getDecimalInternal(this.#_value);
   }
+  
+  ////////////////////////
+  // Bitwise Operations //
+  ////////////////////////
 
-  // Internal binary conversions
+  // TODO: Needs limits to fix operations to the bit depth in use (currently swaps to the
+  // system depth due to using the core ECMA Script Bitwise operators
+
+  and(data) {
+    this.set(this.#convertToDecimal(data) & this.getDecimal());
+    return this.get();
+  }
+
+  not() {
+    this.set(~this.getDecimal());
+    return this.get();
+  }
+
+  or(data) {
+    this.set(this.#convertToDecimal(data) | this.getDecimal());
+    return this.get();
+  }
+
+  xor(data) {
+    this.set(this.#convertToDecimal(data) ^ this.getDecimal());
+    return this.get();
+  }
+
+  /////////////////////////////////
+  // Internal binary conversions //
+  /////////////////////////////////
+
   #decimalToBinary(data) {
     let realBits = 0;
     let precisionBits = 0;
-    let bytes = 0;
-    let maxBits = 32;
     let bitValues = [];
 
-    for (let index = 0; index <= maxBits; index++) {
-      if (data >= (Math.pow(2, index)) && (data < Math.pow(2, index + 1))) {
+    // Find largest bit value
+    for (let index = 0; index < this.#bitTable.length; index++) {
+      if ((data >= this.#bitTable[index]) && (data < this.#bitTable[index + 1])) {
         realBits = index;
         break;
       }
     }
+
+    // Convert TRUE bits to 1's and FALSE to 0's and append to bit array
     while (realBits >= 0) {
-      let bitValue = Math.pow(2, realBits);
+      let bitValue = this.#bitTable[realBits];
       if (data >= bitValue) {
         data -= bitValue;
         bitValues.push(1);
@@ -259,8 +242,9 @@ class BinaryData {
       }
       realBits--;
     }
-    bytes = Math.floor(bitValues.length / 8) + (bitValues.length % 8 ? 1 : 0);
-    precisionBits = bytes * 8;
+
+    // Pad the bit array to the required precision
+    precisionBits = Math.ceil(bitValues.length / this.#resolution) * this.#resolution;
     while (bitValues.length < precisionBits) {
       bitValues.unshift(0);
     }
@@ -271,15 +255,16 @@ class BinaryData {
   #binaryStringToBinary(data) {
     let realBits = 0;
     let precisionBits = 0;
-    let bytes = 0;
     let bitValues = [];
 
+    // Trim the string so that it doesn't effect the precision
     data = data.trim();
     realBits = data.length;
-    bytes = Math.floor(realBits / 8) + (realBits % 8 ? 1 : 0);
-    precisionBits = bytes * 8;
+
+    // Pad the string to the required precision, then create bit array from the split
+    precisionBits = Math.ceil(realBits / this.#resolution) * this.#resolution;
     data.padStart(precisionBits, '0').split('').forEach((str) => {
-      bitValues.push(parseInt(str, 2));
+      if ('01'.includes(str)) { bitValues.push(parseInt(str, 2)); }
     });
 
     return bitValues;
@@ -288,23 +273,28 @@ class BinaryData {
   #binaryArrayToBinary(data) {
     let realBits = 0;
     let precisionBits = 0;
-    let bytes = 0;
     let bitValues = [];
 
     realBits = data.length;
-    bytes = Math.floor(realBits / 8) + (realBits % 8 ? 1 : 0);
-    precisionBits = bytes * 8;
+
+    // Pad the incomming array to the required precision
+    precisionBits = Math.ceil(realBits / this.#resolution) * this.#resolution;
     while (data.length < precisionBits) {
       data.unshift(0);
     }
+
+    // Create bit array from data, converting to 1's and 0's
     data.forEach((value) => {
       bitValues.push(value ? 1 : 0)
     });
 
     return bitValues;
   }
-  
-  // Internal decimal conversions
+
+  //////////////////////////////////
+  // Internal decimal conversions //
+  //////////////////////////////////
+
   #getDecimalInternal(binaryList) {
     let decimal = 0;
 
@@ -334,30 +324,6 @@ class BinaryData {
     }
 
     return 0;
-  }
-
-  // Bitwise Operations
-  // TODO: Needs limits to fix operations to the bit depth in use (currently swaps to the
-  // system depth due to using the core ECMA Script Bitwise operators
-
-  and(data) {
-    this.set(this.#convertToDecimal(data) & this.getDecimal());
-    return this.get();
-  }
-
-  not() {
-    this.set(~this.getDecimal());
-    return this.get();
-  }
-
-  or(data) {
-    this.set(this.#convertToDecimal(data) | this.getDecimal());
-    return this.get();
-  }
-
-  xor(data) {
-    this.set(this.#convertToDecimal(data) ^ this.getDecimal());
-    return this.get();
   }
 }
 

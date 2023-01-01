@@ -13,21 +13,29 @@ var stats = {
 class Tester {
   constructor(message, func, value) {
     stats.tests++;
-    console.log(`Running test: ${message}...`);
+    console.log(`Test: ${message} (${value})...`);
     try {
       if (func(value)) {
         stats.passed++;
-        console.log(`Test passed: ${message}.`);
+        console.log(`Test: ${message} (Passed)`);
       } else {
         stats.failed++;
-        console.error(`Failed test: ${message}!`);
+        console.error(`Test: ${message} (Failed!)`);
       }
     } catch (error) {
-      console.error(`Failed test: ${message}!!!`, error);
+      console.error(`Test: ${message} (Failed!!!)`, error);
       stats.failed++;
     }
+    console.log('');
   }
 }
+
+
+//////////////////////////////////
+
+console.log('Executing tests...');
+console.log('==================');
+console.log('');
 
 //////////////////////////////////
 
@@ -69,8 +77,11 @@ new Tester('Binary array check', (value) => {
 
 //////////////////////////////////
 
-console.log(`Tests Passed: ${stats.passed}`);
-console.log(`Tests Failed: ${stats.failed}`);
-console.log(`Total Test: ${stats.tests}`);
-
-console.log('Testing complete!');
+console.log('=============');
+console.log('Testing Stats');
+console.log('-------------');
+console.log(`Passed: ${stats.passed}`);
+console.log(`Failed: ${stats.failed}`);
+console.log(`Total:  ${stats.tests}`);
+console.log('=============');
+console.log('');
