@@ -157,7 +157,7 @@ class BinaryData {
    */
   get(asArray = false) {
     if (asArray) {
-      return this.#_value;
+      return this.#_value.slice();
     }
     return this.#_value.join('');
   }
@@ -194,21 +194,41 @@ class BinaryData {
   // TODO: Needs limits to fix operations to the bit depth in use (currently swaps to the
   // system depth due to using the core ECMA Script Bitwise operators
 
+  /**
+   * TBA
+   * @returns {string}
+   */
   and(data) {
     this.set(this.#convertToDecimal(data) & this.getDecimal());
     return this.get();
   }
 
+  /**
+   * TBA
+   * @returns {string}
+   */
   not() {
-    this.set(~this.getDecimal());
+    let bitValues = this.get(true);
+    bitValues.forEach((value, index) => {
+      bitValues[index] = value ? 0 : 1;
+    });
+    this.set(bitValues);
     return this.get();
   }
 
+  /**
+   * TBA
+   * @returns {string}
+   */
   or(data) {
     this.set(this.#convertToDecimal(data) | this.getDecimal());
     return this.get();
   }
 
+  /**
+   * TBA
+   * @returns {string}
+   */
   xor(data) {
     this.set(this.#convertToDecimal(data) ^ this.getDecimal());
     return this.get();

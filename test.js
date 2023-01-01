@@ -11,11 +11,14 @@ var stats = {
 };
 
 class Tester {
-  constructor(message, func, value) {
+  constructor() {
+    let args = [...arguments];
+    let message = args.shift();
+    let func = args.shift();
     stats.tests++;
-    console.log(`Test: ${message} (${value})...`);
+    console.log(`Test: ${message} (${args})...`);
     try {
-      if (func(value)) {
+      if (func(...args)) {
         stats.passed++;
         console.log(`Test: ${message} (Passed)`);
       } else {
@@ -75,7 +78,61 @@ new Tester('Binary array check', (value) => {
   return true;
 }, [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]);
 
+
+new Tester('Bitwise and check', (a, b) => {
+  let _test = new BinaryData(a);
+
+  if (_test.get() !== '1101') { return false; }
+  if (_test.getLength() !== 4) { return false; }
+  if (_test.getHex() !== 'D') { return false; }
+  if (_test.getDecimal() !== 13) { return false; }
+  if (_test.and(b) !== '1001') { return false; }
+
+  return true;
+}, 13, 11);
+
+
+new Tester('Bitwise not check', (value) => {
+  let _test = new BinaryData(value);
+
+  if (_test.get() !== '0001') { return false; }
+  if (_test.getLength() !== 4) { return false; }
+  if (_test.getHex() !== '1') { return false; }
+  if (_test.getDecimal() !== 1) { return false; }
+  if (_test.not() !== '1110') { return false; }
+
+  return true;
+}, 1);
+
+
+new Tester('Bitwise or check', (a, b) => {
+  let _test = new BinaryData(a);
+
+  if (_test.get() !== '0001') { return false; }
+  if (_test.getLength() !== 4) { return false; }
+  if (_test.getHex() !== '1') { return false; }
+  if (_test.getDecimal() !== 1) { return false; }
+  if (_test.or(b) !== '0011') { return false; }
+
+  return true;
+}, 1, 2);
+
+
+new Tester('Bitwise xor check', (a, b) => {
+  let _test = new BinaryData(a);
+
+  if (_test.get() !== '0101') { return false; }
+  if (_test.getLength() !== 4) { return false; }
+  if (_test.getHex() !== '5') { return false; }
+  if (_test.getDecimal() !== 5) { return false; }
+  if (_test.xor(b) !== '0110') { return false; }
+
+  return true;
+}, 5, 3);
+
+
 //////////////////////////////////
+
 
 console.log('=============');
 console.log('Testing Stats');
