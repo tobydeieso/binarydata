@@ -55,13 +55,13 @@ new Tester('Decimal value check', (value) => {
 new Tester('Binary string check', (value) => {
   let _test = new BinaryData(value);
 
-  if (_test.get() !== '0001000101111110') { return false; }
-  if (_test.getLength() !== 16) { return false; }
-  if (_test.getHex() !== '117E') { return false; }
-  if (_test.getDecimal() !== 4478) { return false; }
+  if (_test.get() !== '000101100001') { return false; }
+  if (_test.getLength() !== 12) { return false; }
+  if (_test.getHex() !== '161') { return false; }
+  if (_test.getDecimal() !== 353) { return false; }
 
   return true;
-}, '1000101111110');
+}, '101100001');
 
 
 new Tester('Binary array check', (value) => {
