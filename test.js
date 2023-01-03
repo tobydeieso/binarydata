@@ -1,8 +1,4 @@
-/**
- * TBA
- */
-
-const { BinaryData } = require('./index.js');
+import BinaryData from './index.js';
 
 var stats = {
   tests: 0,
@@ -10,6 +6,10 @@ var stats = {
   failed: 0
 };
 
+
+/**
+ * TBA
+ */
 class Tester {
   constructor() {
     let args = [...arguments];
