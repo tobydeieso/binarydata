@@ -14,27 +14,9 @@ class BinaryData {
 
   /**
    * TBA
-   * @type {number|string|Array}
-   */
-  #_raw;
-
-  /**
-   * TBA
-   * @type {string}
-   */
-  #_type;
-
-  /**
-   * TBA
-   * @type {Array}
-   */
-  #_value;
-
-  /**
-   * TBA
    * @type {word[]}
    */
-  #wordTable = [
+  static #wordTable = [
     { binary: '0000', hex: '0', decimal: 0 },
     { binary: '0001', hex: '1', decimal: 1 },
     { binary: '0010', hex: '2', decimal: 2 },
@@ -57,7 +39,25 @@ class BinaryData {
    * TBA
    * @type {number[]}
    */
-  #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ]
+  static #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ]
+
+  /**
+   * TBA
+   * @type {number|string|Array}
+   */
+  #_raw;
+
+  /**
+   * TBA
+   * @type {string}
+   */
+  #_type;
+
+  /**
+   * TBA
+   * @type {Array}
+   */
+  #_value;
 
   /**
    * TBA
@@ -147,7 +147,7 @@ class BinaryData {
    */
   getWord(binary) {
     // TODO: Add support for partial words (e.g. less than 4 bits)
-    return this.#wordTable.find(cell => binary === cell.binary) || this.#wordTable[0];
+    return BinaryData.#wordTable.find(cell => binary === cell.binary) || BinaryData.#wordTable[0];
   }
 
   /**
@@ -244,8 +244,8 @@ class BinaryData {
     let bitValues = [];
 
     // Find largest bit value
-    for (let index = 0; index < this.#bitTable.length; index++) {
-      if ((data >= this.#bitTable[index]) && (data < this.#bitTable[index + 1])) {
+    for (let index = 0; index < BinaryData.#bitTable.length; index++) {
+      if ((data >= BinaryData.#bitTable[index]) && (data < BinaryData.#bitTable[index + 1])) {
         realBits = index;
         break;
       }
@@ -253,7 +253,7 @@ class BinaryData {
 
     // Convert TRUE bits to 1's and FALSE to 0's and append to bit array
     while (realBits >= 0) {
-      let bitValue = this.#bitTable[realBits];
+      let bitValue = BinaryData.#bitTable[realBits];
       if (data >= bitValue) {
         data -= bitValue;
         bitValues.push(1);
