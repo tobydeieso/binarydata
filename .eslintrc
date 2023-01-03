@@ -1,0 +1,47 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "globals": {},
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": "latest"
+  },
+  "extends": "eslint:recommended", // Include default linting rules - see http://eslint.org/docs/rules/ for details
+  "ignorePatterns": ["**/vendor/**/*.*", "**/content/unity/**/*.*", "**/docs/**/*.*"],
+  "rules": {
+    "no-unused-vars": ["warn",
+      { "vars": "local" } // Only check whether local variables are used
+    ],
+    "indent": [
+      "error", 
+      2, // Expect 2 spaces per level of indentation
+      {
+        "VariableDeclarator": 2,
+        "CallExpression": {"arguments": 1},
+        "MemberExpression": 1
+      }
+    ],
+    "camelcase": "warn", // Variables must be written in camelCase style
+    "keyword-spacing": "error", // Expect a space before and after keywords like if, else, for
+    "space-before-blocks": "error", // Expect a space before any {}
+    "no-multi-spaces": "error", // Don't allow multiple spaces next to each other'
+    "brace-style": [
+      "error",
+      "1tbs", // Expect { on same line as statement and } on line below expression
+      { "allowSingleLine": true }
+    ], // Allow both {} on the SAME line
+    "no-mixed-operators": "error", // Use () to clarify logical statements
+    "semi": "error", // Always require semicolons at the end of statements
+    "comma-dangle": "error", // Disallow commas after the last property in an object - they cause errors in older IE browsers
+    "space-infix-ops": ["error", {"int32Hint": false}], // This rule is aimed at ensuring there are spaces around infix operators.
+    //"yoda": ["error", "always"] // This rule aims to enforce consistent style of conditions which compare a variable to a literal value.
+    "eqeqeq": ["error", "always", {"null": "ignore"}], // This rule is aimed at eliminating the type-unsafe equality operators.
+    "quotes": ["error", "single", { "avoidEscape": true }], // This rule enforces the consistent use of single quotes.
+    "semi-spacing": ["error", {"before": false, "after": true}], // This rule aims to enforce spacing around a semicolon.
+    "space-in-parens": ["error", "never"], // This rule will enforce consistency of spacing directly inside of parentheses, by disallowing or requiring one or more spaces to the right of ( and to the left of ). 
+    "block-spacing": ["error", "always"], // This rule enforces consistent spacing inside single-line blocks.
+    "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}] // This rule aims to enforce consistent spacing before function parentheses and as such, will warn whenever whitespace doesn’t match the preferences specified.
+  }
+}
