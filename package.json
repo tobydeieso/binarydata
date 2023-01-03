@@ -1,11 +1,18 @@
 {
-  "name": "astro-binary",
+  "name": "astro-binarydata",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple binary data management class.",
   "main": "index.js",
   "scripts": {
     "test": "node test.js"
   },
   "author": "Toby De Ieso",
-  "license": "GPL-3.0-or-later"
+  "repository": {
+    "type": "git"
+  },
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "eslint": "^8.31.0",
+    "jsdoc": "^4.0.0"
+  }
 }
