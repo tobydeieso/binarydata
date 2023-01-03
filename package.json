@@ -2,9 +2,11 @@
   "name": "astro-binarydata",
   "version": "1.0.0",
   "description": "A simple binary data management class.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "node test.js",
+    "docs": "node ./node_modules/jsdoc/jsdoc.js --private -c jsdoc.config.json"
   },
   "author": "Toby De Ieso",
   "repository": {
