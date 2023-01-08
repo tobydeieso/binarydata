@@ -1,4 +1,4 @@
-# Astro's BinaryData
+# BinaryData
 
 A pseudo binary object type class, scripted as an ECMAScript Module, for use within Node based development. 
 

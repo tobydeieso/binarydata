@@ -1,11 +1,11 @@
 {
-  "name": "astro-binarydata",
-  "version": "1.0.0",
+  "name": "@tobydeieso/binarydata",
+  "version": "1.0.1",
   "description": "A simple binary data management type.",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "github:tobydeieso/astro-binarydata"
+    "url": "github:tobydeieso/binarydata"
   },
   "type": "module",
   "main": "index.js",
@@ -15,8 +15,8 @@
     "docs": "jsdoc --private -c jsdoc.config.json"
   },
   "author": "Toby De Ieso (http://astro-beta.blogspot.com/)",
-  "homepage": "https://github.com/tobydeieso/astro-binarydata#readme",
-  "bugs": "https://github.com/tobydeieso/astro-binarydata/issues",
+  "homepage": "https://github.com/tobydeieso/binarydata#readme",
+  "bugs": "https://github.com/tobydeieso/binarydata/issues",
   "engines": {
     "node": ">=12.0.0"
   },

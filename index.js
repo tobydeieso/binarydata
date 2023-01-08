@@ -1,5 +1,5 @@
 /*!
- * Astro's BinaryData
+ * @tobydeieso / BinaryData
  * Copyright (C) 2023  Toby De Ieso
  */
 
