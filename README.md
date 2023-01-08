@@ -230,6 +230,7 @@ A lightweight testing script has been included for local validation. Similar to 
 * Complete JSDoc code comments.
 * Convert internal methods to static.
 * Look for possible optimisations.
+* Add extra ignore items for the npm package.
 
 ## Credits
 
