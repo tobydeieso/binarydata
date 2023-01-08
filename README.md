@@ -217,3 +217,7 @@ A lightweight testing script has been included for local validation. Similar to 
 ## TODO
 
 * Complete JSDoc code comments.
+
+## Credits
+
+Developed by Toby De Ieso
