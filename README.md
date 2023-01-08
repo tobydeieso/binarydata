@@ -39,13 +39,13 @@ npm install astro-binarydata
 ECMAScript Module usage...
 
 ```javascript
-import BinaryData from 'astro-binarydata';
+import BinaryData from '@tobydeieso/binarydata';
 ```
 
 CommonJS usage...
 
 ```javascript
-const BinaryData = require('astro-binarydata');
+const BinaryData = require('@tobydeieso/binarydata');
 ```
 
 ### Creating a new BinaryData instance

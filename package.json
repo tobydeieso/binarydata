@@ -16,7 +16,9 @@
   },
   "author": "Toby De Ieso (http://astro-beta.blogspot.com/)",
   "homepage": "https://github.com/tobydeieso/binarydata#readme",
-  "bugs": "https://github.com/tobydeieso/binarydata/issues",
+  "bugs": {
+    "url": "https://github.com/tobydeieso/binarydata/issues"
+  },
   "engines": {
     "node": ">=12.0.0"
   },
