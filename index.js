@@ -1,20 +1,61 @@
-/**
- * A word type
- * @typedef {Object} word
- * @property {string} binary
- * @property {string} hex
- * @property {number} decimal 
+/*!
+ * Astro's BinaryData
+ * Copyright (C) 2023  Toby De Ieso
  */
 
 
 /**
- * A custom binary data type, where it's stored as an array of numbers.
+ * A binary number represented in string format, containing only the characters 1 and 0.
+ * @typedef {string} binaryString
+ * @example
+ * '1001101' // The decimal value of 77
+ */
+
+/**
+ * A binary number represented in string format, containing only the characters 0-9 and A-F.
+ * @typedef {string} hexString
+ * @example
+ * '0x4D' // The decimal value of 77
+ */
+
+/**
+ * A binary number represented as an array of numbers with either the value of 1 or 0.
+ * @typedef {number[]} binaryArray
+ * @example
+ * [1, 1, 0, 1, 0, 0, 1] // The decimal value of 77
+ */
+
+/**
+ * An Object representing a single binay value in 3 different ways.
+ * @typedef {Object} word
+ * @property {binaryString} binary - A string that represents a binary value, consisting of 1's and 0's.
+ * @property {hexString} hex - A string that represents a hexadecimal value, consisting of the characters 0-9 and A-F.
+ * @property {decimal} decimal - A decimal number value.
+ */
+
+/**
+ * A integer number value, anywhere from 0 to 4,294,967,295.
+ * @typedef {number} decimal
+ */
+
+
+/**
+ * Astro's BinaryData Module
+ * @module astro-binarydata
+ */
+
+/**
+ * A custom binary data type, where the binary data is stored as an array of 
+ * integer numbers (0's and 1's) with a bit length rounded up to the nearest 4 bit (word).
+ * The class has methods to return the binary value in other formats, including 
+ * a {@link binaryString}, {@link hexString} or {@link decimal} number value.
  */
 class BinaryData {
 
   /**
-   * TBA
+   * A quick access table for word objects (e.g. 4 bit binary values), from 0000 to 1111.
    * @type {word[]}
+   * @static
    */
   static #wordTable = [
     { binary: '0000', hex: '0', decimal: 0 },
@@ -36,42 +77,61 @@ class BinaryData {
   ];
 
   /**
-   * TBA
+   * An array of bit values for each position upto 32 bit.
    * @type {number[]}
+   * @static
    */
   static #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ];
 
   /**
    * TBA
-   * @type {number|string|Array}
+   * @type {string}
+   * @static
+   */
+  static #validBinaryChars = '01';
+
+  /**
+   * TBA
+   * @type {string}
+   * @static
+   */
+  static #validHexChars = '0123456789ABCDEF';
+
+  /**
+   * TBA
+   * @type {string}
+   * @static
+   */
+  static #hexPrefix = '0x';
+
+  /**
+   * A copy of the raw data passed into the constructor.
+   * @type {decimal|binaryString|binaryArray}
    */
   #_raw;
 
   /**
-   * TBA
+   * The detected type of data that was passed into the constructor, represented as a string.
+   * It can be one of the following 3 values:
+   * * 'decimal' : {@link decimal}
+   * * 'binaryString' : {@link binaryString}
+   * * 'binaryArray' : {@link binaryArray}
    * @type {string}
    */
   #_type;
 
   /**
-   * TBA
-   * @type {Array}
+   * The binary value that all internal methods will be run from.
+   * @type {binaryArray}
    */
   #_value;
 
   /**
-   * TBA
-   * @type {number[]}
+   * The minimum bit resolution for all internal binary objects.
+   * @type {number}
    */
   #resolution = 4;
 
-  /**
-   * TBA
-   * @param {number|string|Array} data
-   */
-  constructor(data) {
-    this.set(data);
-  }
 
   //////////////////
   // External API //
@@ -79,11 +139,20 @@ class BinaryData {
 
   /**
    * TBA
-   * @param {number|string|Array} data
+   * @param {decimal|binaryString|binaryArray} data
+   */
+  constructor(data) {
+    this.set(data);
+  }
+
+
+  /**
+   * TBA
+   * @param {decimal|binaryString|binaryArray} data
    * @returns {boolean}
    */
   set(data) {
-    this.#_raw = data;
+    this.#_raw = Array.isArray(data) ? data.slice() : data;
     this.#_value = [];
 
     if (typeof data === 'number') {
@@ -92,17 +161,56 @@ class BinaryData {
       this.#_type = 'decimal';
       this.#_value = this.#decimalToBinary(data);
 
+      if (!this.#_value) {
+        // Error
+        console.error(`Invalid decimal number (input: ${this.#_raw})`);
+        this.#_type = 'error';
+        return false;
+      }
+
     } else if (typeof data === 'string') {
+      // Trim the string so that it doesn't effect the transform
+      data = data.trim();
 
-      // Convert a string of 1's and 0's
-      this.#_type = 'binaryString';
-      this.#_value = this.#binaryStringToBinary(data);
+      if (data.startsWith(BinaryData.#hexPrefix)) {
 
-    } else if (typeof data === 'object' && Array.isArray(data)) {
+        // Convert a hexadecimal string, beginging with '0x'
+        this.#_type = 'hexString';
+        this.#_value = this.#hexStringToBinary(data);
+
+        if (!this.#_value) {
+          // Error
+          console.error(`Invalid hexadecimal string (input: ${this.#_raw})`);
+          this.#_type = 'error';
+          return false;
+        }
+
+      } else {
+
+        // Convert a string of 1's and 0's
+        this.#_type = 'binaryString';
+        this.#_value = this.#binaryStringToBinary(data);
+
+        if (!this.#_value) {
+          // Error
+          console.error(`Invalid binary string (input: ${this.#_raw})`);
+          this.#_type = 'error';
+          return false;
+        }
+
+      }
+    } else if (Array.isArray(data)) {
 
       // Convert an array of 0's and 1's
       this.#_type = 'binaryArray';
       this.#_value = this.#binaryArrayToBinary(data);
+
+      if (!this.#_value) {
+        // Error
+        console.error(`Invalid binary array (input: ${this.#_raw})`);
+        this.#_type = 'error';
+        return false;
+      }
 
     } else {
 
@@ -116,21 +224,27 @@ class BinaryData {
     return true;
   }
 
+
   /**
    * Returns the bit length of the value stored
    * @returns {number}
    */
   getLength() {
-    return this.#_value.length;
+    if (this.#_type !== 'error') {
+      return this.#_value.length;
+    }
+    return 0;
   }
+
 
   /**
    * TBA
-   * @returns {number|string|Array}
+   * @returns {decimal|binaryString|binaryArray}
    */
   getRaw() {
     return this.#_raw;
   }
+
 
   /**
    * TBA
@@ -140,53 +254,73 @@ class BinaryData {
     return this.#_type;
   }
 
+
   /**
    * TBA
-   * @param {string} binary 
-   * @returns {word}
+   * @returns {binaryString|boolean}
    */
-  getWord(binary) {
-    // TODO: Add support for partial words (e.g. less than 4 bits)
-    return BinaryData.#wordTable.find(cell => binary === cell.binary) || BinaryData.#wordTable[0];
+  getString() {
+    if (this.#_type !== 'error') {
+      return this.#_value.join('');
+    }
+    return false;
   }
 
   /**
    * TBA
-   * @param {boolean} [asArra=false]
-   * @returns {string|boolean[]}
+   * @returns {binaryString|boolean}
    */
-  get(asArray = false) {
-    if (asArray) {
+  get() {
+    if (this.#_type !== 'error') {
+      return this.#_value.join('');
+    }
+    return false;
+  }
+
+
+  /**
+   * TBA
+   * @returns {binaryArray|boolean}
+   */
+  getArray() {
+    if (this.#_type !== 'error') {
       return this.#_value.slice();
     }
-    return this.#_value.join('');
+    return false;
   }
+
 
   /**
    * TBA
-   * @returns {string}
+   * @returns {hexString|boolean}
    */
   getHex() {
-    let hex = '';
-    let binary = this.get();
-    let word = (binary.length / 4) - 1;
+    if (this.#_type !== 'error') {
+      let hex = BinaryData.#hexPrefix;
+      let binaryArray = this.getArray();
 
-    while (word >= 0) {
-      hex = this.getWord(binary.slice(word * 4, (word * 4) + 4)).hex + hex;
-      word--;
+      while (binaryArray.length) {
+        hex += this.#getWordFromBinary(binaryArray.splice(0, 4).join('')).hex;
+      }
+
+      return hex;
     }
-
-    return hex;
+    return false;
   }
+
 
   /**
    * TBA
-   * @returns {number}
+   * @returns {decimal|boolean}
    */
   getDecimal() {
-    return this.#getDecimalInternal(this.#_value);
+    if (this.#_type !== 'error') {
+      return this.#getDecimalInternal(this.#_value);
+    }
+    return false;
   }
   
+
   ////////////////////////
   // Bitwise Operations //
   ////////////////////////
@@ -196,48 +330,88 @@ class BinaryData {
 
   /**
    * TBA
-   * @returns {string}
+   * @returns {string|undefined}
    */
   and(data) {
-    this.set(this.#convertToDecimal(data) & this.getDecimal());
-    return this.get();
+    if (this.#_type !== 'error') {
+      this.set(this.#convertToDecimal(data) & this.getDecimal());
+      return this.get();
+    }
+    return undefined;
   }
+
 
   /**
    * TBA
-   * @returns {string}
+   * @returns {string|undefined}
    */
   not() {
-    let bitValues = this.get(true);
-    bitValues.forEach((value, index) => {
-      bitValues[index] = value ? 0 : 1;
-    });
-    this.set(bitValues);
-    return this.get();
+    if (this.#_type !== 'error') {
+      let bitValues = this.getArray();
+      bitValues.forEach((value, index) => {
+        bitValues[index] = value ? 0 : 1;
+      });
+      this.set(bitValues);
+      return this.get();
+    }
+    return undefined;
   }
+
 
   /**
    * TBA
-   * @returns {string}
+   * @returns {string|undefined}
    */
   or(data) {
-    this.set(this.#convertToDecimal(data) | this.getDecimal());
-    return this.get();
+    if (this.#_type !== 'error') {
+      this.set(this.#convertToDecimal(data) | this.getDecimal());
+      return this.get();
+    }
+    return undefined;
   }
+
 
   /**
    * TBA
-   * @returns {string}
+   * @returns {string|undefined}
    */
   xor(data) {
-    this.set(this.#convertToDecimal(data) ^ this.getDecimal());
-    return this.get();
+    if (this.#_type !== 'error') {
+      this.set(this.#convertToDecimal(data) ^ this.getDecimal());
+      return this.get();
+    }
+    return undefined;
   }
+
 
   /////////////////////////////////
   // Internal binary conversions //
   /////////////////////////////////
 
+  /**
+   * TBA
+   * @param {string} binary 
+   * @returns {word}
+   */
+  #getWordFromBinary(binary) {
+    // TODO: Add support for partial words (e.g. less than 4 bits)
+    return BinaryData.#wordTable.find(cell => binary === cell.binary) || BinaryData.#wordTable[0];
+  }
+
+  /**
+   * TBA
+   * @param {string} hex 
+   * @returns {word}
+   */
+  #getWordFromHex(hex) {
+    return BinaryData.#wordTable.find(cell => hex === cell.hex) || BinaryData.#wordTable[0];
+  }
+
+  /**
+   * TBA
+   * @param {decimal} data 
+   * @returns {binaryArray}
+   */
   #decimalToBinary(data) {
     let realBits = 0;
     let precisionBits = 0;
@@ -272,25 +446,67 @@ class BinaryData {
     return bitValues;
   }
 
+  /**
+   * TBA
+   * @param {hexString} data 
+   * @returns {binaryArray}
+   */
+  #hexStringToBinary(data) {
+    let success = true;
+    let bitValues = [];
+
+    // Convert to uppercase to prevent issues going forward
+    data = data.toUpperCase();
+
+    // Check for valid hex values, find relevant word object, then create bit array from the binaryString split
+    data.substring(2, data.length).split('').forEach((str) => {
+      if (BinaryData.#validHexChars.includes(str)) {
+        this.#getWordFromHex(str).binary.split('').forEach((value) => {
+          bitValues.push(parseInt(value, 2));
+        });
+      } else {
+        success = false;
+      }
+    });
+
+    if (success) { return bitValues; }
+    return false;
+  }
+
+  /**
+   * TBA
+   * @param {binaryString} data 
+   * @returns {binaryArray}
+   */
   #binaryStringToBinary(data) {
+    let success = true;
     let realBits = 0;
     let precisionBits = 0;
     let bitValues = [];
 
-    // Trim the string so that it doesn't effect the precision
-    data = data.trim();
     realBits = data.length;
 
     // Pad the string to the required precision, then create bit array from the split
     precisionBits = Math.ceil(realBits / this.#resolution) * this.#resolution;
     data.padStart(precisionBits, '0').split('').forEach((str) => {
-      if ('01'.includes(str)) { bitValues.push(parseInt(str, 2)); }
+      if (BinaryData.#validBinaryChars.includes(str)) {
+        bitValues.push(parseInt(str, 2));
+      } else {
+        success = false;
+      }
     });
 
-    return bitValues;
+    if (success) { return bitValues; }
+    return false;
   }
 
+  /**
+   * TBA
+   * @param {binaryArray} data 
+   * @returns {binaryArray}
+   */
   #binaryArrayToBinary(data) {
+    let success = true;
     let realBits = 0;
     let precisionBits = 0;
     let bitValues = [];
@@ -303,28 +519,43 @@ class BinaryData {
       data.unshift(0);
     }
 
-    // Create bit array from data, converting to 1's and 0's
+    // Create bit array from data, checking f0r 1's and 0's
     data.forEach((value) => {
-      bitValues.push(value ? 1 : 0);
+      if (value === 1 || value === 0) {
+        bitValues.push(value);
+      } else {
+        success = false;
+      }
     });
 
-    return bitValues;
+    if (success) { return bitValues; }
+    return false;
   }
 
   //////////////////////////////////
   // Internal decimal conversions //
   //////////////////////////////////
 
-  #getDecimalInternal(binaryList) {
+  /**
+   * TBA
+   * @param {binaryArray} data 
+   * @returns {decimal}
+   */
+  #getDecimalInternal(data) {
     let decimal = 0;
 
-    binaryList.slice().reverse().forEach((value, bit) => {
+    data.slice().reverse().forEach((value, bit) => {
       if (value) { decimal += Math.pow(2, bit); }
     });
 
     return decimal;
   }
 
+  /**
+   * TBA
+   * @param {decimal|binaryArray|binaryString} data 
+   * @returns {decimal}
+   */
   #convertToDecimal(data) {
     if (typeof data === 'number') {
 
@@ -336,7 +567,7 @@ class BinaryData {
       // Convert a string of 1's and 0's
       return this.#getDecimalInternal(this.#binaryStringToBinary(data));
 
-    } else if (typeof data === 'object' && Array.isArray(data)) {
+    } else if (Array.isArray(data)) {
 
       // Convert an array of 0's and 1's
       return this.#getDecimalInternal(this.#binaryArrayToBinary(data));

@@ -5,7 +5,7 @@
   },
   "sourceType": "module",
   "tags": {
-    "allowUnknownTags": true,
+    "allowUnknownTags": false,
     "dictionaries": ["jsdoc", "closure"]
   },
   "plugins": [
@@ -20,7 +20,7 @@
     "verbose": true
    },
    "templates": {
-    "cleverLinks": false,
+    "cleverLinks": true,
     "monospaceLinks": false
   }
 } 
