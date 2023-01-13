@@ -24,12 +24,23 @@ Unlike the default ECMAScript bitwise operators, the **BinaryData** operators wi
 
 * [Node.js](https://nodejs.org/) (^12.x)
 
+## Dependencies
+
+### Production
+
+* None!
+
+### Development
+
+* [ESLint](https://www.npmjs.com/package/eslint)
+* [JSDoc](https://www.npmjs.com/package/jsdoc)
+
 ## Installation
 
 Nothing complicated here, just a simple npm package, installed with the following command:
 
 ```
-npm install astro-binarydata
+npm install @tobydeieso/binarydata
 ```
 
 ## Usage
@@ -98,9 +109,18 @@ myBinary.getArray();
 
 **hexString**
 
+With hex prefix of `0x`...
+
 ```javascript
 myBinary.getHex();
 // '0x5D'
+```
+
+Without hex prefix...
+
+```javascript
+myBinary.getHex(true);
+// '5D'
 ```
 
 **decimal**
@@ -217,6 +237,9 @@ A lightweight testing script has been included for local validation. Similar to 
 ## TODO
 
 * Complete JSDoc code comments.
+* Convert internal methods to static.
+* Look for possible optimisations.
+* ~~Add extra ignore items for the npm package.~~
 
 ## Credits
 
