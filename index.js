@@ -292,11 +292,12 @@ class BinaryData {
 
   /**
    * TBA
+   * @param {boolean} [removePrefix=false]
    * @returns {hexString|boolean}
    */
-  getHex() {
+  getHex(removePrefix) {
     if (this.#_type !== 'error') {
-      let hex = BinaryData.#hexPrefix;
+      let hex = removePrefix ? '' : BinaryData.#hexPrefix;
       let binaryArray = this.getArray();
 
       while (binaryArray.length) {
