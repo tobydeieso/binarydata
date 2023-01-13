@@ -109,9 +109,18 @@ myBinary.getArray();
 
 **hexString**
 
+With hex prefix of `0x`...
+
 ```javascript
 myBinary.getHex();
 // '0x5D'
+```
+
+Without hex prefix...
+
+```javascript
+myBinary.getHex(true);
+// '5D'
 ```
 
 **decimal**
@@ -230,7 +239,7 @@ A lightweight testing script has been included for local validation. Similar to 
 * Complete JSDoc code comments.
 * Convert internal methods to static.
 * Look for possible optimisations.
-* Add extra ignore items for the npm package.
+* ~~Add extra ignore items for the npm package.~~
 
 ## Credits
 
