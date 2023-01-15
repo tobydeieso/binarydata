@@ -41,11 +41,11 @@
 
 /**
  * Astro's BinaryData Module
- * @module astro-binarydata
+ * @module @tobydeieso/binarydata
  */
 
 /**
- * A custom binary data type, where the binary data is stored as an array of 
+ * A custom binary data type, where the binary data ({@link binaryArray}) is stored as an array of 
  * integer numbers (0's and 1's) with a bit length rounded up to the nearest 4 bit (word).
  * The class has methods to return the binary value in other formats, including 
  * a {@link binaryString}, {@link hexString} or {@link decimal} number value.
@@ -84,25 +84,31 @@ class BinaryData {
   static #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ];
 
   /**
-   * TBA
+   * A string of valid characters that can be contained within a binary string.
    * @type {string}
    * @static
    */
   static #validBinaryChars = '01';
 
   /**
-   * TBA
+   * A string of valid characters that can be contained within a hexadecimal string.
    * @type {string}
    * @static
    */
   static #validHexChars = '0123456789ABCDEF';
 
   /**
-   * TBA
+   * A prefix that signifies a text string contains a hexadecimal value.
    * @type {string}
    * @static
    */
   static #hexPrefix = '0x';
+
+  /**
+   * The minimum bit resolution for all internal binary objects.
+   * @type {number}
+   */
+  static #maxPrecision = 32;
 
   /**
    * A copy of the raw data passed into the constructor.
@@ -114,8 +120,10 @@ class BinaryData {
    * The detected type of data that was passed into the constructor, represented as a string.
    * It can be one of the following 3 values:
    * * 'decimal' : {@link decimal}
+   * * 'hexString' : {@link hexString}
    * * 'binaryString' : {@link binaryString}
    * * 'binaryArray' : {@link binaryArray}
+   * * 'error' : The data type could not be detected OR the conversion failed.
    * @type {string}
    */
   #_type;
@@ -139,19 +147,20 @@ class BinaryData {
 
   /**
    * TBA
-   * @param {decimal|binaryString|binaryArray} data
+   * @param {decimal|hexString|binaryString|binaryArray} data
    */
-  constructor(data) {
-    this.set(data);
+  constructor(data, precision) {
+    this.set(data, precision);
   }
 
 
   /**
    * TBA
-   * @param {decimal|binaryString|binaryArray} data
+   * @param {decimal|hexString|binaryString|binaryArray} data
+   * @param {number} [precision]
    * @returns {boolean}
    */
-  set(data) {
+  set(data, precision) {
     this.#_raw = Array.isArray(data) ? data.slice() : data;
     this.#_value = [];
 
@@ -221,6 +230,15 @@ class BinaryData {
 
     }
 
+    // Increase the precision of the provided binary data value, unless the value already required a higher
+    // precision to be stored (up to the max precision).
+    if (precision && (typeof precision === 'number')) {
+      precision = Math.max(0, Math.min(BinaryData.#maxPrecision, precision));
+      if (precision > this.getPrecision()) {
+        this.leftAdd(Array(precision - this.getPrecision()).fill(0));
+      }
+    } 
+
     return true;
   }
 
@@ -229,7 +247,7 @@ class BinaryData {
    * Returns the bit length of the value stored
    * @returns {number}
    */
-  getLength() {
+  getPrecision() {
     if (this.#_type !== 'error') {
       return this.#_value.length;
     }
@@ -238,8 +256,19 @@ class BinaryData {
 
 
   /**
-   * TBA
-   * @returns {decimal|binaryString|binaryArray}
+   * Returns the bit length of the value stored
+   * @deprecated
+   * @see BinaryData.getPrecision
+   * @returns {number}
+   */
+  getLength() {
+    this.getPrecision();
+  }
+
+
+  /**
+   * Returns the raw data that was passed in when the instance was created OR when the `set` method was called.
+   * @returns {decimal|hexString|binaryString|binaryArray}
    */
   getRaw() {
     return this.#_raw;
@@ -330,7 +359,8 @@ class BinaryData {
   // system depth due to using the core ECMA Script Bitwise operators
 
   /**
-   * TBA
+   * AND operator returns a 1 in each bit position for which the corresponding bits of both operands are 1s.
+   * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
   and(data) {
@@ -343,7 +373,7 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * NOT operator inverts the bits of its operand.
    * @returns {string|undefined}
    */
   not() {
@@ -360,7 +390,8 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * OR operator returns a 1 in each bit position for which the corresponding bits of either or both operands are 1s.
+   * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
   or(data) {
@@ -373,7 +404,8 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * XOR operator returns a 1 in each bit position for which the corresponding bits of either but not both operands are 1s.
+   * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
   xor(data) {
@@ -382,6 +414,124 @@ class BinaryData {
       return this.get();
     }
     return undefined;
+  }
+
+
+  //////////////////////////
+  // Binary Modifications //
+  //////////////////////////
+
+  /**
+   * TBA
+   * @param {decimal|hexString|binaryString|binaryArray} data 
+   * @returns {boolean}
+   */
+  leftAdd(data) {
+    let tempData = new BinaryData(data);
+    if (tempData.getConversionType !== 'error') {
+      this.#_value.unshift(...tempData.getArray());
+      return true;
+    }
+    return false;
+  }
+
+
+  /**
+   * TBA
+   * @param {decimal|hexString|binaryString|binaryArray} data 
+   * @returns {boolean}
+   */
+  rightAdd(data) {
+    let tempData = new BinaryData(data);
+    if (tempData.getConversionType !== 'error') {
+      this.#_value.push(...tempData.getArray());
+      return true;
+    }
+    return false;
+  }
+  
+
+  /**
+   * Manually replace the value of a single bit within the existing binary data.
+   * @param {boolean|number} value 
+   * @param {number} index 
+   * @returns {boolean}
+   */
+  setBit(value, index) {
+    if (typeof index === 'number') {
+      if ((value >= 0) && (value < this.getLength())) {
+        this.#_value[index] = value ? 1 : 0;
+        return true;
+      }
+      console.error('Index out of range.');
+    } else {
+      console.error('Invalid index type, must be a number.');
+    }
+    return false;
+  }
+
+
+  /**
+   * TBA
+   * @param {binaryString|binaryArray} data
+   * @param {number} startIndex
+   * @returns {boolean}
+   */
+  setBits(data, startIndex) {
+    if (typeof data === 'string') { data = data.trim().split(''); }
+
+    if (Array.isArray(data)) {
+      if (data.every(value => BinaryData.#validBinaryChars.includes(value))) {
+        if ((typeof startIndex === 'number') && (startIndex >= 0) && (startIndex < data.length)) {
+          if (startIndex + data.length < this.getLength()) {
+            this.#_value.splice(startIndex, data.length, ...data);
+            return true;
+          } else {
+            console.error('Replacement data too large to fit from startIndex.');
+          }
+        }
+        console.error('startIndex out of range.');
+      } else {
+        console.error('Invalid binary value, must be either a valid binaryString or binaryArray.');
+      }
+    } else {
+      console.error('Invalid data, must be either a binaryString or binaryArray.');
+    }
+    return false;
+  }
+
+
+  /**
+   * TBA
+   * @param {number} offset
+   * @returns {boolean}
+   */
+  leftShift(offset) {
+    if (typeof offset === 'number') {
+      offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
+      this.#_value.push(...Array(offset).fill(0));
+      this.#_value.splice(0, 4);
+      return true;
+    }
+    console.error('Invalid shift balue, must be number.');
+    return false;
+  }
+
+
+  /**
+   * TBA
+   * @param {number} offset 
+   * @returns {boolean}
+   */
+  rightShift(offset) {
+    if (typeof offset === 'number') {
+      offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
+      this.#_value.unshift(...Array(offset).fill(0));
+      this.#_value.splice(-4, 4);
+      return true;
+    }
+    console.error('Invalid shift balue, must be number.');
+    return false;
   }
 
 
