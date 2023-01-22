@@ -1,5 +1,5 @@
 /*!
- * @tobydeieso / BinaryData
+ * @tobydeieso/BinaryData
  * Copyright (C) 2023  Toby De Ieso
  */
 
@@ -26,11 +26,14 @@
  */
 
 /**
- * An Object representing a single binay value in 3 different ways.
+ * An Object representing a single word value (e.g. 4 bits) in 3 different formats.
  * @typedef {Object} word
  * @property {binaryString} binary - A string that represents a binary value, consisting of 1's and 0's.
  * @property {hexString} hex - A string that represents a hexadecimal value, consisting of the characters 0-9 and A-F.
  * @property {decimal} decimal - A decimal number value.
+ * @example
+ * { binary: '0101', hex: '5', decimal: 5 }
+ * 
  */
 
 /**
@@ -40,7 +43,7 @@
 
 
 /**
- * Astro's BinaryData Module
+ * Toby De Ieso's BinaryData Module
  * @module @tobydeieso/binarydata
  */
 
@@ -84,14 +87,14 @@ class BinaryData {
   static #bitTable = [ 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648, 4294967296 ];
 
   /**
-   * A string of valid characters that can be contained within a binary string.
+   * A string of characters that can be contained within a valid binary string.
    * @type {string}
    * @static
    */
   static #validBinaryChars = '01';
 
   /**
-   * A string of valid characters that can be contained within a hexadecimal string.
+   * A string of characters that can be contained within a valid hexadecimal string.
    * @type {string}
    * @static
    */
@@ -112,13 +115,13 @@ class BinaryData {
 
   /**
    * A copy of the raw data passed into the constructor.
-   * @type {decimal|binaryString|binaryArray}
+   * @type {decimal|hexString|binaryString|binaryArray}
    */
   #_raw;
 
   /**
    * The detected type of data that was passed into the constructor, represented as a string.
-   * It can be one of the following 3 values:
+   * It can be one of the following 5 values:
    * * 'decimal' : {@link decimal}
    * * 'hexString' : {@link hexString}
    * * 'binaryString' : {@link binaryString}
@@ -146,8 +149,9 @@ class BinaryData {
   //////////////////
 
   /**
-   * TBA
+   * Creates a new BinaryData object
    * @param {decimal|hexString|binaryString|binaryArray} data
+   * @param {number} precision
    */
   constructor(data, precision) {
     this.set(data, precision);
@@ -233,7 +237,7 @@ class BinaryData {
     // Increase the precision of the provided binary data value, unless the value already required a higher
     // precision to be stored (up to the max precision).
     if (precision && (typeof precision === 'number')) {
-      precision = Math.max(0, Math.min(BinaryData.#maxPrecision, precision));
+      precision = Math.max(0, Math.min(BinaryData.#maxPrecision, Math.ceil(precision / this.#resolution) * this.#resolution));
       if (precision > this.getPrecision()) {
         this.leftAdd(Array(precision - this.getPrecision()).fill(0));
       }
@@ -257,8 +261,7 @@ class BinaryData {
 
   /**
    * Returns the bit length of the value stored
-   * @deprecated
-   * @see BinaryData.getPrecision
+   * @deprecated Since version 1.1.0
    * @returns {number}
    */
   getLength() {
@@ -276,7 +279,13 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * Returns the internal detection routine used when converting input data, represented as a string.
+   * It can be one of the following 5 values:
+   * * 'decimal' : {@link decimal}
+   * * 'hexString' : {@link hexString}
+   * * 'binaryString' : {@link binaryString}
+   * * 'binaryArray' : {@link binaryArray}
+   * * 'error' : The data type could not be detected OR the conversion failed.
    * @returns {string}
    */
   getConversionType() {
@@ -285,44 +294,45 @@ class BinaryData {
 
 
   /**
-   * TBA
-   * @returns {binaryString|boolean}
+   * Returns the binaryString reprsentation of the data stored within the BinaryData instance.
+   * @returns {binaryString|undefined}
    */
   getString() {
     if (this.#_type !== 'error') {
       return this.#_value.join('');
     }
-    return false;
+    return undefined;
   }
 
   /**
-   * TBA
-   * @returns {binaryString|boolean}
+   * Returns the binaryString reprsentation of the data stored within the BinaryData instance.
+   * @returns {binaryString|undefined}
    */
   get() {
     if (this.#_type !== 'error') {
       return this.#_value.join('');
     }
-    return false;
+    return undefined;
   }
 
 
   /**
-   * TBA
-   * @returns {binaryArray|boolean}
+   * Returns a duplicated version of the internal binaryArray.
+   * @returns {binaryArray|undefined}
    */
   getArray() {
     if (this.#_type !== 'error') {
       return this.#_value.slice();
     }
-    return false;
+    return undefined;
   }
 
 
   /**
-   * TBA
+   * Returns the hexString reprsentation of the data stored within the BinaryData instance.
+   * This can be with or without the hexadecimal string prefix of `0x`.
    * @param {boolean} [removePrefix=false]
-   * @returns {hexString|boolean}
+   * @returns {hexString|undefined}
    */
   getHex(removePrefix) {
     if (this.#_type !== 'error') {
@@ -335,19 +345,19 @@ class BinaryData {
 
       return hex;
     }
-    return false;
+    return undefined;
   }
 
 
   /**
-   * TBA
-   * @returns {decimal|boolean}
+   * Returns the decimal value of the data stored within the BinaryData instance.
+   * @returns {decimal|undefined}
    */
   getDecimal() {
     if (this.#_type !== 'error') {
       return this.#getDecimalInternal(this.#_value);
     }
-    return false;
+    return undefined;
   }
   
 
@@ -359,7 +369,8 @@ class BinaryData {
   // system depth due to using the core ECMA Script Bitwise operators
 
   /**
-   * AND operator returns a 1 in each bit position for which the corresponding bits of both operands are 1s.
+   * AND method returns a 1 in each bit position for which the corresponding bits (e.g. from the 
+   * input data) of both are 1s.
    * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
@@ -373,7 +384,7 @@ class BinaryData {
 
 
   /**
-   * NOT operator inverts the bits of its operand.
+   * NOT method inverts the bits wihtin the internal binaryArray.
    * @returns {string|undefined}
    */
   not() {
@@ -390,7 +401,8 @@ class BinaryData {
 
 
   /**
-   * OR operator returns a 1 in each bit position for which the corresponding bits of either or both operands are 1s.
+   * OR method returns a 1 in each bit position for which the corresponding bits (e.g. from the 
+   * input data) of either or both are 1s.
    * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
@@ -404,7 +416,8 @@ class BinaryData {
 
 
   /**
-   * XOR operator returns a 1 in each bit position for which the corresponding bits of either but not both operands are 1s.
+   * XOR method returns a 1 in each bit position for which the corresponding bits (e.g. from the 
+   * input data) of either but not both are 1s.
    * @param {decimal|hexString|binaryString|binaryArray} data
    * @returns {string|undefined}
    */
@@ -422,7 +435,7 @@ class BinaryData {
   //////////////////////////
 
   /**
-   * TBA
+   * Add bit values to the left of the binary data.
    * @param {decimal|hexString|binaryString|binaryArray} data 
    * @returns {boolean}
    */
@@ -437,7 +450,7 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * Add bit values to the right of the binary data.
    * @param {decimal|hexString|binaryString|binaryArray} data 
    * @returns {boolean}
    */
@@ -452,14 +465,15 @@ class BinaryData {
   
 
   /**
-   * Manually replace the value of a single bit within the existing binary data.
+   * Manually replace the value of a single bit within the existing internal binaryArray at an 
+   * index from `0` to `getPrecision() - 1`.
    * @param {boolean|number} value 
    * @param {number} index 
    * @returns {boolean}
    */
   setBit(value, index) {
     if (typeof index === 'number') {
-      if ((value >= 0) && (value < this.getLength())) {
+      if ((value >= 0) && (value < this.getPrecision())) {
         this.#_value[index] = value ? 1 : 0;
         return true;
       }
@@ -472,7 +486,7 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * Manually replace the value of 1 or more bits within the existing binary data, starting from a bit index.
    * @param {binaryString|binaryArray} data
    * @param {number} startIndex
    * @returns {boolean}
@@ -502,7 +516,9 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * Shifts the internal binary data a specified number of bits to the left, within the precision
+   * of the BinaryData instance. Excess bits shifted off to the left are discarded. Zero bits 
+   * are shifted in from the right.
    * @param {number} offset
    * @returns {boolean}
    */
@@ -519,7 +535,9 @@ class BinaryData {
 
 
   /**
-   * TBA
+   * Shifts the internal binary data a specified number of bits to the right, within the precision
+   * of the BinaryData instance. Excess bits shifted off to the right are discarded. Zero bits 
+   * are shifted in from the left.
    * @param {number} offset 
    * @returns {boolean}
    */
@@ -541,6 +559,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {string} binary 
    * @returns {word}
    */
@@ -551,6 +570,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {string} hex 
    * @returns {word}
    */
@@ -560,6 +580,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {decimal} data 
    * @returns {binaryArray}
    */
@@ -599,6 +620,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {hexString} data 
    * @returns {binaryArray}
    */
@@ -626,6 +648,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {binaryString} data 
    * @returns {binaryArray}
    */
@@ -653,6 +676,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {binaryArray} data 
    * @returns {binaryArray}
    */
@@ -689,6 +713,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {binaryArray} data 
    * @returns {decimal}
    */
@@ -704,6 +729,7 @@ class BinaryData {
 
   /**
    * TBA
+   * @private
    * @param {decimal|binaryArray|binaryString} data 
    * @returns {decimal}
    */
