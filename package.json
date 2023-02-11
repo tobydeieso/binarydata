@@ -17,7 +17,7 @@
     "docs-all": "jsdoc --private -c jsdoc.config.json"
   },
   "author": "Toby De Ieso (http://astro-beta.blogspot.com/)",
-  "homepage": "https://github.com/tobydeieso/binarydata#readme",
+  "homepage": "https://tobydeieso.github.io/binarydata/",
   "bugs": {
     "url": "https://github.com/tobydeieso/binarydata/issues"
   },
