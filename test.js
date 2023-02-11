@@ -148,6 +148,20 @@ new Tester('Bitwise xor check', (a, b) => {
 }, 5, 3);
 
 
+new Tester('setBit check', (a, b, c) => {
+  let _test = new BinaryData(a);
+
+  if (!_test.setBit(b, c)) { return false; }
+
+  if (_test.get() !== '0101000111111110') { return false; }
+  if (_test.getPrecision() !== 16) { return false; }
+  if (_test.getHex() !== '0x51FE') { return false; }
+  if (_test.getDecimal() !== 20990) { return false; }
+
+  return true;
+}, 20862, 7, true);
+
+
 new Tester('leftAdd check', (a, b) => {
   let _test = new BinaryData(a);
 
