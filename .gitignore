@@ -2,7 +2,7 @@
 /node_modules
 
 # Documentation output
-/docs
+# /docs
 
 # Windows thumbnail cache files
 Thumbs.db

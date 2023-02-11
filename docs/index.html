@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>BinaryData</h1>
+<p>A pseudo binary object type class, scripted as an ECMAScript Module, for use within Node based development.</p>
+<h2>Introduction</h2>
+<p>Internally the <strong>BinaryData</strong> class stores data as an array of integer numbers (0's and 1's), with an array (bit) length padded out to the nearest multiple of 4 (e.g. 1 word), and limited to a maximum of 32 (e.g. 32 bits).</p>
+<p>When creating a new <strong>BinaryData</strong> instance, a range of different input data types can be used, including:</p>
+<ul>
+<li><strong>binaryArray</strong>: an array of 1's and 0's (as numbers), e.g. <code>[ 1, 0, 0, 1, 1, 0, 1 ]</code></li>
+<li><strong>binaryString</strong>: a binary string of 1's and 0's, e.g. <code>'1001101'</code></li>
+<li><strong>hexString</strong>: a hexadecimal string (containing uppercase A-F characters), prefixed with <code>'0x'</code>, e.g. <code>'0x4D'</code>, and</li>
+<li><strong>decimal</strong>: a decimal value, stored as a number, e.g. <code>77</code>
+<ul>
+<li><em>Due to the 32 bit limitations, values are limited to an integer from 0 to 4,294,967,295.</em></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> In the above examples, all types were referencing the same decimal value of 77.</p>
+</blockquote>
+<p>Once you have a new <strong>BinaryData</strong> instance, you are then able to access the base methods to convert the internal binary data into different formats. Or if the binary data requires manipulation, you have access to basic bitwise operations.</p>
+<p>Unlike the default ECMAScript bitwise operators, the <strong>BinaryData</strong> operators will function at the bit depth of the instances value. For example, running the bitwise <code>not</code> operation on an initial input <strong>binaryString</strong> value of <code>'100010'</code> will return <code>'11011101'</code>. This is due to the fact that the initial input was only 6 bits, and therefore padded out nearest word, e.g. 8 bits.</p>
+<h2>Prerequisites</h2>
+<ul>
+<li><a href="https://nodejs.org/">Node.js</a> (^12.x)</li>
+</ul>
+<h2>Dependencies</h2>
+<h3>Production</h3>
+<ul>
+<li>None!</li>
+</ul>
+<h3>Development</h3>
+<ul>
+<li><a href="https://www.npmjs.com/package/eslint">ESLint</a></li>
+<li><a href="https://www.npmjs.com/package/jsdoc">JSDoc</a></li>
+</ul>
+<h2>Installation</h2>
+<p>Nothing complicated here, just a simple npm package, installed with the following command:</p>
+<pre class="prettyprint source"><code>npm install @tobydeieso/binarydata
+</code></pre>
+<h2>Usage</h2>
+<h3>Importing into your code</h3>
+<p>ECMAScript Module usage...</p>
+<pre class="prettyprint source lang-javascript"><code>import BinaryData from '@tobydeieso/binarydata';
+</code></pre>
+<p>CommonJS usage...</p>
+<pre class="prettyprint source lang-javascript"><code>const BinaryData = require('@tobydeieso/binarydata');
+</code></pre>
+<h3>Creating a new BinaryData instance</h3>
+<p>Using a binary array argument...</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData([1, 0, 1, 1, 1, 0, 1]);
+</code></pre>
+<p>Using a binary string argument...</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData('1011101');
+</code></pre>
+<p>Using a hexadecimal string argument...</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData('0x5D');
+</code></pre>
+<p>Using a decimal number argument...</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData(93);
+</code></pre>
+<h3>Accessing BinaryData</h3>
+<p>Just like when creating a new instance using different input formats, it is possible to convert the internal binary array back into the following types:</p>
+<blockquote>
+<p><strong>Note:</strong> All operations were run on the initial binary value of <code>01011101</code></p>
+</blockquote>
+<p><strong>binaryString</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.get();
+// '01011101'
+myBinary.getString();
+// '01011101'
+</code></pre>
+<p><strong>binaryArray</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.getArray();
+// [0, 1, 0, 1, 1, 1, 0, 1]
+</code></pre>
+<p><strong>hexString</strong></p>
+<p>With hex prefix of <code>0x</code>...</p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.getHex();
+// '0x5D'
+</code></pre>
+<p>Without hex prefix...</p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.getHex(true);
+// '5D'
+</code></pre>
+<p><strong>decimal</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.getDecimal();
+// 93
+</code></pre>
+<h3>Bitwise Operations</h3>
+<blockquote>
+<p><strong>Note:</strong> All operations were run on the initial binary value of <code>01011101</code></p>
+</blockquote>
+<p><strong>and</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.and('10011');
+// '00010001'
+</code></pre>
+<p><strong>not</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.not();
+// '10100010'
+</code></pre>
+<p><strong>or</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.or('10011');
+// '01011111'
+</code></pre>
+<p><strong>xor</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.xor('10011');
+// '01001110'
+</code></pre>
+<h3>Binary Modifications</h3>
+<blockquote>
+<p><strong>Note:</strong> All modifications were run on the initial binary value of <code>0101000101111110</code></p>
+</blockquote>
+<p><strong>setBit</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.setBit(7, true);
+// '0101000111111110'
+</code></pre>
+<p><strong>leftAdd</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.leftAdd(1011);
+// '10110101000101111110'
+</code></pre>
+<p><strong>rightAdd</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.rightAdd(1011);
+// '01010001011111101011'
+</code></pre>
+<p><strong>leftShift</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.leftShift(2);
+// '0100010111111000'
+</code></pre>
+<p><strong>rightShift</strong></p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.rightShift(5);
+// '0000001010001011'
+</code></pre>
+<h3>Other Methods</h3>
+<p><strong>set</strong></p>
+<p>To set a new binary value on the BinaryData instance, just call <code>set</code> and pass in any of the types supported by the constructor.</p>
+<pre class="prettyprint source lang-javascript"><code>myBinary.set('110010111010');
+// true
+</code></pre>
+<p><strong>getPrecision</strong></p>
+<p>To access the bit depth of the BinaryData instance, call <code>getPrecision</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData('1011101');
+myBinary.getLength();
+// 8
+</code></pre>
+<p><strong>getConversionType</strong></p>
+<p>To find out the internal routine used to generate the internal binaryArray data, call <code>getConversionType</code>.</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData('1011101');
+myBinary.getConversionType();
+// 'binaryString'
+</code></pre>
+<p>The possible returned values from <code>getConversionType</code> are:</p>
+<ul>
+<li><code>'binaryArray'</code></li>
+<li><code>'binaryString'</code></li>
+<li><code>'hexString'</code></li>
+<li><code>'decimal'</code></li>
+<li><code>'error'</code></li>
+</ul>
+<h3>Detecting Conversion Errors</h3>
+<p>If you have just created a new <strong>BinaryData</strong> instance, then check to see if the value returned from <code>getConversionType</code> equals 'error'. If it does, that means something went wrong in the conversion process.</p>
+<pre class="prettyprint source lang-javascript"><code>let myBinary = new BinaryData({});
+if (myBinary.getConversionType() === 'error') {
+  // You have an error with your provided data and the conversion routines failed to create a binary array.
+};
+</code></pre>
+<p>If you are changing the value of a <strong>BinaryData</strong> instance, then the <code>set</code> method will return <code>true</code> if it was successful or <code>false</code> if it wasn't.</p>
+<pre class="prettyprint source lang-javascript"><code>if (!myBinary.set('13110')) {
+  // You have an error with your provided data and the conversion routines failed to create a binary array.
+};
+</code></pre>
+<h2>Documentation</h2>
+<p>The detailed JSDoc formatted documentation can be created for this project, by;</p>
+<ol>
+<li>cloning the repository to your local system <code>git clone https://github.com/tobydeieso/astro-binarydata.git</code>, then</li>
+<li>installing the required packages using <code>npm install</code> within the projects folder, and finally</li>
+<li>running the command <code>npm run docs</code></li>
+</ol>
+<p>The documentation will now be accessible from with the <code>./docs</code> folder, and all you need to do is open the <code>index.html</code> file within your chosen browser.</p>
+<h2>Testing and Validation</h2>
+<p>A lightweight testing script has been included for local validation. Similar to the documentation all you need to do is run the command <code>npm test</code> (once the repository is on your local system).</p>
+<h2>TODO</h2>
+<ul>
+<li>Complete JSDoc code comments.</li>
+<li>Convert internal methods to static.</li>
+<li>Look for possible optimisations.</li>
+<li><s>Add extra ignore items for the npm package.</s></li>
+</ul>
+<h2>Credits</h2>
+<p>Developed by Toby De Ieso</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-@tobydeieso_binarydata.html">@tobydeieso/binarydata</a></li></ul><h3>Classes</h3><ul><li><a href="module-@tobydeieso_binarydata-BinaryData.html">BinaryData</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Sat Feb 11 2023 23:46:34 GMT+1030 (Australian Central Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
