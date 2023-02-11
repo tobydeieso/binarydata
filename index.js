@@ -474,42 +474,12 @@ class BinaryData {
   setBit(value, index) {
     if (typeof index === 'number') {
       if ((value >= 0) && (value < this.getPrecision())) {
-        this.#_value[index] = value ? 1 : 0;
+        this.#_value[this.getPrecision() - (index + 1)] = value ? 1 : 0;
         return true;
       }
       console.error('Index out of range.');
     } else {
       console.error('Invalid index type, must be a number.');
-    }
-    return false;
-  }
-
-
-  /**
-   * Manually replace the value of 1 or more bits within the existing binary data, starting from a bit index.
-   * @param {binaryString|binaryArray} data
-   * @param {number} startIndex
-   * @returns {boolean}
-   */
-  setBits(data, startIndex) {
-    if (typeof data === 'string') { data = data.trim().split(''); }
-
-    if (Array.isArray(data)) {
-      if (data.every(value => BinaryData.#validBinaryChars.includes(value))) {
-        if ((typeof startIndex === 'number') && (startIndex >= 0) && (startIndex < data.length)) {
-          if (startIndex + data.length < this.getLength()) {
-            this.#_value.splice(startIndex, data.length, ...data);
-            return true;
-          } else {
-            console.error('Replacement data too large to fit from startIndex.');
-          }
-        }
-        console.error('startIndex out of range.');
-      } else {
-        console.error('Invalid binary value, must be either a valid binaryString or binaryArray.');
-      }
-    } else {
-      console.error('Invalid data, must be either a binaryString or binaryArray.');
     }
     return false;
   }
@@ -526,7 +496,7 @@ class BinaryData {
     if (typeof offset === 'number') {
       offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
       this.#_value.push(...Array(offset).fill(0));
-      this.#_value.splice(0, 4);
+      this.#_value.splice(0, offset);
       return true;
     }
     console.error('Invalid shift balue, must be number.');
@@ -545,7 +515,7 @@ class BinaryData {
     if (typeof offset === 'number') {
       offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
       this.#_value.unshift(...Array(offset).fill(0));
-      this.#_value.splice(-4, 4);
+      this.#_value.splice(-offset, offset);
       return true;
     }
     console.error('Invalid shift balue, must be number.');
