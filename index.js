@@ -435,53 +435,57 @@ class BinaryData {
   //////////////////////////
 
   /**
+   * Manually replace the value of a single bit within the existing internal binaryArray at an 
+   * index from `0` to `getPrecision() - 1`.
+   * @param {number} index
+   * @param {boolean} value 
+   * @returns {string|undefined}
+   */
+  setBit(index, value) {
+    if (typeof index === 'number') {
+      if (typeof value === 'boolean') {
+        if ((value >= 0) && (value < this.getPrecision())) {
+          this.#_value[this.getPrecision() - (index + 1)] = value ? 1 : 0;
+          return this.get();
+        }
+        console.error('Index out of range.');
+      } else {
+        console.error('Invalid value type, must be a boolean.');
+      }
+    } else {
+      console.error('Invalid index type, must be a number.');
+    }
+    return undefined;
+  }
+
+
+  /**
    * Add bit values to the left of the binary data.
    * @param {decimal|hexString|binaryString|binaryArray} data 
-   * @returns {boolean}
+   * @returns {string|undefined}
    */
   leftAdd(data) {
     let tempData = new BinaryData(data);
     if (tempData.getConversionType !== 'error') {
       this.#_value.unshift(...tempData.getArray());
-      return true;
+      return this.get();
     }
-    return false;
+    return undefined;
   }
 
 
   /**
    * Add bit values to the right of the binary data.
    * @param {decimal|hexString|binaryString|binaryArray} data 
-   * @returns {boolean}
+   * @returns {string|undefined}
    */
   rightAdd(data) {
     let tempData = new BinaryData(data);
     if (tempData.getConversionType !== 'error') {
       this.#_value.push(...tempData.getArray());
-      return true;
+      return this.get();
     }
-    return false;
-  }
-  
-
-  /**
-   * Manually replace the value of a single bit within the existing internal binaryArray at an 
-   * index from `0` to `getPrecision() - 1`.
-   * @param {boolean|number} value 
-   * @param {number} index 
-   * @returns {boolean}
-   */
-  setBit(value, index) {
-    if (typeof index === 'number') {
-      if ((value >= 0) && (value < this.getPrecision())) {
-        this.#_value[this.getPrecision() - (index + 1)] = value ? 1 : 0;
-        return true;
-      }
-      console.error('Index out of range.');
-    } else {
-      console.error('Invalid index type, must be a number.');
-    }
-    return false;
+    return undefined;
   }
 
 
@@ -490,17 +494,17 @@ class BinaryData {
    * of the BinaryData instance. Excess bits shifted off to the left are discarded. Zero bits 
    * are shifted in from the right.
    * @param {number} offset
-   * @returns {boolean}
+   * @returns {string|undefined}
    */
   leftShift(offset) {
     if (typeof offset === 'number') {
       offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
       this.#_value.push(...Array(offset).fill(0));
       this.#_value.splice(0, offset);
-      return true;
+      return this.get();
     }
     console.error('Invalid shift balue, must be number.');
-    return false;
+    return undefined;
   }
 
 
@@ -509,17 +513,17 @@ class BinaryData {
    * of the BinaryData instance. Excess bits shifted off to the right are discarded. Zero bits 
    * are shifted in from the left.
    * @param {number} offset 
-   * @returns {boolean}
+   * @returns {string|undefined}
    */
   rightShift(offset) {
     if (typeof offset === 'number') {
       offset = Math.max(0, Math.min(BinaryData.#maxPrecision, offset));
       this.#_value.unshift(...Array(offset).fill(0));
       this.#_value.splice(-offset, offset);
-      return true;
+      return this.get();
     }
     console.error('Invalid shift balue, must be number.');
-    return false;
+    return undefined;
   }
 
 
