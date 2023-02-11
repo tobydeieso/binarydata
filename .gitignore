@@ -1,2 +1,17 @@
-node_modules/
-docs/
+# 3rd party node packages
+/node_modules
+
+# Documentation output
+/docs
+
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
