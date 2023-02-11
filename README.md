@@ -162,6 +162,45 @@ myBinary.xor('10011');
 // '01001110'
 ```
 
+### Binary Modifications
+
+> **Note:** All modifications were run on the initial binary value of `0101000101111110`
+
+**setBit**
+
+```javascript
+myBinary.setBit(7, true);
+// '0101000111111110'
+```
+
+**leftAdd**
+
+```javascript
+myBinary.leftAdd(1011);
+// '10110101000101111110'
+```
+
+**rightAdd**
+
+```javascript
+myBinary.rightAdd(1011);
+// '01010001011111101011'
+```
+
+**leftShift**
+
+```javascript
+myBinary.leftShift(2);
+// '0100010111111000'
+```
+
+**rightShift**
+
+```javascript
+myBinary.rightShift(5);
+// '0000001010001011'
+```
+
 ### Other Methods
 
 **set**
@@ -173,9 +212,9 @@ myBinary.set('110010111010');
 // true
 ```
 
-**getLength**
+**getPrecision**
 
-To access the bit depth of the BinaryData instance, call `getLength`.
+To access the bit depth of the BinaryData instance, call `getPrecision`.
 
 ```javascript
 let myBinary = new BinaryData('1011101');
@@ -232,7 +271,7 @@ The documentation will now be accessible from with the `./docs` folder, and all 
 
 ## Testing and Validation
 
-A lightweight testing script has been included for local validation. Similar to the documentation all you need to do is run the command `npm run test` (once the repository is on your local system).
+A lightweight testing script has been included for local validation. Similar to the documentation all you need to do is run the command `npm test` (once the repository is on your local system).
 
 ## TODO
 

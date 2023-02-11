@@ -1,6 +1,6 @@
-node_modules/
-docs/
-.vscode/
+/node_modules
+/docs
+/.vscode
 .eslintrc
 jsdoc.config.json
 test.js
