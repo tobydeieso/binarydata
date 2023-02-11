@@ -13,7 +13,8 @@
   "scripts": {
     "test": "node test.js",
     "lint": "eslint .",
-    "docs": "jsdoc --private -c jsdoc.config.json"
+    "docs": "jsdoc -c jsdoc.config.json",
+    "docs-all": "jsdoc --private -c jsdoc.config.json"
   },
   "author": "Toby De Ieso (http://astro-beta.blogspot.com/)",
   "homepage": "https://github.com/tobydeieso/binarydata#readme",
