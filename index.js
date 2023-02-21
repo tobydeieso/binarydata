@@ -359,6 +359,23 @@ class BinaryData {
     }
     return undefined;
   }
+
+
+  /**
+   * Returns the decimal value of the data stored within the BinaryData instance, taking into account the sign.
+   * @returns {decimal|undefined}
+   */
+  getSignedDecimal() {
+    if (this.#_type !== 'error') {
+      let nagative = (this.#_value[0] === 1);
+      if (nagative) {
+        this.#_value[0] = 0;
+        return this.#getDecimalInternal(this.#_value) * -1;
+      }
+      return this.#getDecimalInternal(this.#_value);
+    }
+    return undefined;
+  }
   
 
   ////////////////////////
@@ -562,6 +579,9 @@ class BinaryData {
     let realBits = 0;
     let precisionBits = 0;
     let bitValues = [];
+    let negative = data < 0;
+
+    data = Math.abs(data);
 
     // Find largest bit value
     for (let index = 0; index < BinaryData.#bitTable.length; index++) {
@@ -588,6 +608,8 @@ class BinaryData {
     while (bitValues.length < precisionBits) {
       bitValues.unshift(0);
     }
+
+    if (negative) { bitValues[0] = 1; }
 
     return bitValues;
   }

@@ -1,6 +1,6 @@
 {
   "name": "@tobydeieso/binarydata",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A simple binary data management type.",
   "keywords": ["binary", "hexadecimal", "decimal"],
   "license": "GPL-3.0-only",

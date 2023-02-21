@@ -55,18 +55,33 @@ new Tester('Decimal value check', (value) => {
   if (_test.getPrecision() !== 16) { return false; }
   if (_test.getHex() !== '0x517E') { return false; }
   if (_test.getDecimal() !== value) { return false; }
+  if (_test.getSignedDecimal() !== value) { return false; }
 
   return true;
 }, 20862);
 
 
-new Tester('Decimal value check', (value) => {
+new Tester('Signed Decimal value check', (value) => {
+  let _test = new BinaryData(value);
+
+  if (_test.get() !== '1101000101111110') { return false; }
+  if (_test.getPrecision() !== 16) { return false; }
+  if (_test.getHex() !== '0xD17E') { return false; }
+  if (_test.getDecimal() !== 53630) { return false; }
+  if (_test.getSignedDecimal() !== value) { return false; }
+
+  return true;
+}, -20862);
+
+
+new Tester('Hex value check', (value) => {
   let _test = new BinaryData(value);
 
   if (_test.get() !== '0101000101111110') { return false; }
   if (_test.getPrecision() !== 16) { return false; }
   if (_test.getHex() !== value) { return false; }
   if (_test.getDecimal() !== 20862) { return false; }
+  if (_test.getSignedDecimal() !== 20862) { return false; }
 
   return true;
 }, '0x517E');
@@ -79,6 +94,7 @@ new Tester('Binary string check', (value) => {
   if (_test.getPrecision() !== 12) { return false; }
   if (_test.getHex() !== '0x161') { return false; }
   if (_test.getDecimal() !== 353) { return false; }
+  if (_test.getSignedDecimal() !== 353) { return false; }
 
   return true;
 }, '101100001');
@@ -91,6 +107,7 @@ new Tester('Binary array check', (value) => {
   if (_test.getPrecision() !== 16) { return false; }
   if (_test.getHex() !== '0x10A0') { return false; }
   if (_test.getDecimal() !== 4256) { return false; }
+  if (_test.getSignedDecimal() !== 4256) { return false; }
 
   return true;
 }, [1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]);
